@@ -16,8 +16,8 @@ import requests
 app = Flask(__name__)
 
 TALKAPI_KEY = os.environ['tk_ap']
-YOUR_CHANNEL_ACCESS_TOKEN = os.environ["line_channel_token"]
-YOUR_CHANNEL_SECRET = os.environ["line_channel_secret"]
+YOUR_CHANNEL_ACCESS_TOKEN = ["LINE_CHANNEL_ACCESS_TOKEN"]
+YOUR_CHANNEL_SECRET = ["LINE_CAHNNEL_SECRET"]
 
 line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
