@@ -1,46 +1,57 @@
 from flask import Flask, request, abort
-
 from linebot import (
-   LineBotApi, WebhookHandler
+    LineBotApi, WebhookHandler
 )
 from linebot.exceptions import (
-   InvalidSignatureError
+    InvalidSignatureError
 )
 from linebot.models import (
-   MessageEvent, TextMessage, TextSendMessage,
+    MessageEvent, TextMessage, TextSendMessage,
 )
+import os
+#追加
+import pya3rt
 
 app = Flask(__name__)
 
-line_bot_api = LineBotApi('l93wr01BmymtABAEVZxmWQ/QEl/ipfVjemoA4s6ClYQZ1SpTJIBQaddiMMM4bixbs94c6DSOOv+2CaOpF6tjDKqK/JtB7JhphBrXLK8z43Xjl7IMdmQGAVTnxHz9k+Utd9kgUw5eli6+F1LJUQSqaAdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('2bd122c701510001c9bd7d68c536a1c5')
+YOUR_CHANNEL_ACCESS_TOKEN = os.environ["line_channel_token"]
+YOUR_CHANNEL_SECRET = os.environ["line_channel_secret"]
 
+line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
+handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
 @app.route("/callback", methods=['POST'])
 def callback():
-   # get X-Line-Signature header value
-   signature = request.headers['X-Line-Signature']
+    signature = request.headers['X-Line-Signature']
+    body = request.get_data(as_text=True)
+    app.logger.info("Request body: " + body)
 
-   # get request body as text
-   body = request.get_data(as_text=True)
-   app.logger.info("Request body: " + body)
+    try:
+        handler.handle(body, signature)
+    except InvalidSignatureError:
+        print("Invalid signature. Please check your channel access token/channel secret.")
+        abort(400)
+    return 'OK'
 
-   # handle webhook body
-   try:
-       handler.handle(body, signature)
-   except InvalidSignatureError:
-       print("Invalid signature. Please check your channel access token/channel secret.")
-       abort(400)
-
-   return 'OK'
 
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-   line_bot_api.reply_message(
-       event.reply_token,
-       TextSendMessage(text=event.message.text))
+    #（追加）talk_aiメソッドに引数を渡して返り値をai_messageに代入
+    ai_message = talk_ai(event.message.text)
+    line_bot_api.reply_message(
+        event.reply_token,
+        #TextSendMessage(text=event.message.txt))
+        #（修正）ai_messageを返すようにする
+        TextSendMessage(text=ai_message))
 
+#（追加）pya3rtでai会話を返信
+def talk_ai(word):
+    apikey = os.environ["tk_ap"]
+    client = pya3rt.TalkClient(apikey)
+    reply_message = client.talk(word)
+    return reply_message['results'][0]['reply']
 
 if __name__ == "__main__":
-   app.run(host='127.0.0.1', port=8080, debug=True)
+    port = int(os.getenv("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
