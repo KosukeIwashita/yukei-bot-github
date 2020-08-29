@@ -9,8 +9,8 @@ import pya3rt
 
 app=Flask(__name__)
 #環境変数の取得
-YOUR_CHANNEL_ACCESS_TOKEN="line_channel_token"
-YOUR_CHANNEL_SECRET="line_channel_secret"
+YOUR_CHANNEL_ACCESS_TOKEN="l93wr01BmymtABAEVZxmWQ/QEl/ipfVjemoA4s6ClYQZ1SpTJIBQaddiMMM4bixbs94c6DSOOv+2CaOpF6tjDKqK/JtB7JhphBrXLK8z43Xjl7IMdmQGAVTnxHz9k+Utd9kgUw5eli6+F1LJUQSqaAdB04t89/1O/w1cDnyilFU="
+YOUR_CHANNEL_SECRET="2bd122c701510001c9bd7d68c536a1c5"
 line_bot_api=LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler=WebhookHandler(YOUR_CHANNEL_SECRET)
 
@@ -40,7 +40,7 @@ def handle_message(event):
 
 #A3RTのTalkAPIにより応答
 def talkapi_response(text):
-    apikey = "tk_ap"
+    apikey = "DZZSPWtxfG7VGhTzbvsSqYzP3FJvQrUP"
     client = pya3rt.TalkClient(apikey)
     response = client.talk(text)
     return ((response['results'])[0])['reply']
